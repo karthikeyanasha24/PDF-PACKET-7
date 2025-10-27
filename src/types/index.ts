@@ -7,7 +7,30 @@ export interface ProjectFormData {
   emailAddress: string;
   phoneNumber: string;
   date: string;
-  status: string;
+  status: {
+    forReview: boolean;
+    forApproval: boolean;
+    forRecord: boolean;
+    forInformationOnly: boolean;
+  };
+  submittalType: {
+    tds: boolean;
+    threePartSpecs: boolean;
+    testReportIccEsr5194: boolean;
+    testReportIccEsl1645: boolean;
+    fireAssembly: boolean;
+    fireAssembly01: boolean;
+    fireAssembly02: boolean;
+    fireAssembly03: boolean;
+    msds: boolean;
+    leedGuide: boolean;
+    installationGuide: boolean;
+    warranty: boolean;
+    samples: boolean;
+    other: boolean;
+    otherText?: string;
+  };
+  product: string;
 }
 
 // Document types
