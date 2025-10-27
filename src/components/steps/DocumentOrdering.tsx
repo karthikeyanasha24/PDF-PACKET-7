@@ -4,6 +4,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
@@ -74,7 +75,7 @@ function SortableItem({ document, index, totalCount, onRemove, onMoveUp, onMoveD
       className={cn(
         "bg-white dark:bg-gray-800 rounded-xl border-2 p-6 transition-all duration-200",
         isDragging 
-          ? "border-primary-500 shadow-2xl scale-105 rotate-2 z-50" 
+          ? "border-primary-500 shadow-2xl scale-105 rotate-2 z-50 opacity-90 bg-opacity-90"
           : "border-gray-200 dark:border-gray-700 hover:border-primary-300 hover:shadow-md"
       )}
     >
@@ -83,7 +84,7 @@ function SortableItem({ document, index, totalCount, onRemove, onMoveUp, onMoveD
         <button
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          className="cursor-grab active:cursor-grabbing p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors touch-none"
           aria-label="Drag to reorder"
         >
           <Bars3Icon className="w-5 h-5 text-gray-400" />
@@ -94,15 +95,7 @@ function SortableItem({ document, index, totalCount, onRemove, onMoveUp, onMoveD
           {index + 1}
         </div>
 
-        {/* Document Type Badge */}
-        <div className={cn(
-          "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium",
-          `bg-${config.color}-100 text-${config.color}-700`,
-          `dark:bg-${config.color}-900/20 dark:text-${config.color}-300`
-        )}>
-          <span className="mr-1">{config.icon}</span>
-          {document.document.type}
-        </div>
+       
 
         {/* Document Info */}
         <div className="flex-1 min-w-0">
@@ -181,7 +174,13 @@ export default function DocumentOrdering({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // Require 8px of movement before dragging starts
+        distance: 2,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 50,
+        tolerance: 5,
       },
     }),
     useSensor(KeyboardSensor, {

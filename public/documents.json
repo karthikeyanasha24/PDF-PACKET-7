@@ -1,0 +1,72 @@
+[
+  {
+    "id": "tds-maxterra",
+    "name": "Technical Data Sheet",
+    "description": "MAXTERRA MgO Non-Combustible Single Layer Structural Floor Panels",
+    "filename": "TDS - MAXTERRA MgO Non-Combustible Single Layer Structural Floor Panels 01-14-25 Version 1.2 Email (1) (1).pdf",
+    "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/TDS%20-%20MAXTERRA%C2%AE%20MgO%20Non-Combustible%20Single%20Layer%20Structural%20Floor%20Panels%2001-14-25%20Version%201.2%20Email%20(1)%20(1).pdf",
+    "size": 1769344,
+    "type": "TDS",
+    "required": false
+  },
+  {
+    "id": "msds-safety",
+    "name": "Material Safety Data Sheet",
+    "description": "MAXTERRA MgO Non-Combustible Single Layer Structural Floor Panels",
+    "filename": "MSDS - MAXTERRA MgO Non-Combustible Single Layer Structural Floor Panels - Version 1 Sept 2024.pdf",
+    "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/MSDS%20-%20MAXTERRA%E2%84%A2%20MgO%20Non-Combustible%20Single%20Layer%20Structural%20Floor%20Panels%20-%20Version%201%20Sept%202024.pdf",
+    "size": 300088,
+    "type": "MSDS",
+    "required": false
+  },
+  {
+    "id": "leed-credit-guide",
+    "name": "LEED Credit Guide",
+    "description": "LEED v4 Credit Information for MAXTERRA",
+    "filename": "LEED Credit Guide 7-16-25 (1).pdf",
+    "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/LEED%20Credit%20Guide%207-16-25%20(1).pdf",
+    "size": 522459,
+    "type": "LEED",
+    "required": false
+  },
+  {
+    "id": "installation-guide",
+    "name": "Installation Guide",
+    "description": "MAXTERRA MgO Non-Combustible Single-Layer Subfloor Installation Instructions",
+    "filename": "Installation Guide - MAXTERRA MgO Non-Combustible Single-Layer Subfloor - V 1.02.pdf",
+    "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/Installation%20Guide%20-%20MAXTERRA%E2%84%A2%20MgO%20Non-Combustible%20Single-Layer%20Subfloor%20-%20V%201.02.pdf",
+    "size": 2699385,
+    "type": "Installation",
+    "required": false
+  },
+  {
+    "id": "limited-warranty",
+    "name": "Limited warranty",
+    "description": "Product warranty Information",
+    "filename": "Limited warranty - 8-31-2023.pdf",
+    "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/Limited%20Warranty%20-%208-31-2023.pdf",
+    "size": 123375,
+    "type": "Warranty",
+    "required": false
+  },
+  {
+    "id": "acoustic-certification",
+    "name": "Acoustic Certification",
+    "description": "ESL-1645 Certified Floor/Ceiling Acoustical Performance",
+    "filename": "ESL-1645 Certified FloorCeiling Acoustical Performance - June 2025 (2).pdf",
+    "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/ESL-1645%20Certified%20FloorCeiling%20Acoustical%20Performance%20-%20June%202025%20(2).pdf",
+    "size": 535035,
+    "type": "Acoustic",
+    "required": false
+  },
+  {
+    "id": "esr-5194",
+    "name": "ESR-5194 Evaluation Report",
+    "description": "MAXTERRA MgO Non-Combustible Single Layer Structural Floor Panels",
+    "filename": "ESR-5194 - MAXTERRA MgO Non-Combustible Single Layer Structural Floor Panels - June 2024 (4) (1).pdf",
+    "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/ESR-5194%20-%20MAXTERRA%E2%84%A2%20MgO%20Non-Combustible%20Single%20Layer%20Structural%20Floor%20Panels%20-%20June%202024%20(4)%20(1).pdf",
+    "size": 660331,
+    "type": "ESR",
+    "required": false
+  }
+]

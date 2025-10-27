@@ -125,8 +125,8 @@ export default function Layout({
       <footer className="relative z-10 mt-20 border-t border-white/10 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              © 2024 MAXTERRA®. Professional documentation made simple.
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+              © {new Date().getFullYear()} NextGen
             </p>
             <div className="mt-4 flex justify-center space-x-6 text-xs text-gray-400 dark:text-gray-500">
               <span>Privacy Policy</span>

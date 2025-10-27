@@ -132,11 +132,10 @@ function App() {
                     className="text-center mb-12"
                   >
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 bg-clip-text text-transparent mb-4">
-                      PDF Packet Builder
+                      Maxterra Submittal Form Builder
                     </h1>
                     <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-                      Create professional documentation packets with MAXTERRA® technical specifications, 
-                      warranties, and installation guides in just a few simple steps.
+                      Create a professional MAXTERRA® submittal form with technical specifications, warranties, and installation guides in a few simple steps.
                     </p>
                   </motion.div>
 

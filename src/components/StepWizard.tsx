@@ -36,8 +36,8 @@ const steps: Step[] = [
         formData.projectName &&
         formData.preparedBy &&
         formData.email &&
-        formData.status &&
-        formData.product
+        formData.status
+        
       )
     },
   },

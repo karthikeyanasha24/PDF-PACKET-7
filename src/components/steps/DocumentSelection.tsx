@@ -1,25 +1,15 @@
-import { useState, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  DocumentDuplicateIcon,
-  MagnifyingGlassIcon,
-  CheckCircleIcon,
-  ArrowRightIcon,
-  ArrowLeftIcon,
-  FunnelIcon,
-  XMarkIcon,
-  EyeIcon
-} from '@heroicons/react/24/outline'
-import { cn, formatFileSize, generateId } from '@/utils'
-import { availableDocuments, documentTypeConfig } from '@/data/documents'
-import PacketStats from '@/components/PacketStats'
-import type { SelectedDocument, DocumentType } from '@/types'
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn, formatFileSize, generateId } from '@/utils';
+import { availableDocuments, documentTypeConfig } from '@/data/documents';
+import PacketStats from '@/components/PacketStats';
+import type { SelectedDocument, DocumentType } from '@/types';
 
 interface DocumentSelectionProps {
-  selectedDocuments: SelectedDocument[]
-  onUpdateSelectedDocuments: (documents: SelectedDocument[]) => void
-  onNext: () => void
-  onPrevious: () => void
+  selectedDocuments: SelectedDocument[];
+  onUpdateSelectedDocuments: (documents: SelectedDocument[]) => void;
+  onNext: () => void;
+  onPrevious: () => void;
 }
 
 export default function DocumentSelection({
@@ -28,38 +18,49 @@ export default function DocumentSelection({
   onNext,
   onPrevious,
 }: DocumentSelectionProps) {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState<DocumentType | 'all'>('all')
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState<DocumentType | 'all'>('all');
 
   // Filter and search documents
   const filteredDocuments = useMemo(() => {
     return availableDocuments.filter(doc => {
       const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           doc.description.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesFilter = filterType === 'all' || doc.type === filterType
-      return matchesSearch && matchesFilter
-    })
-  }, [searchTerm, filterType])
+                           doc.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesFilter = filterType === 'all' || doc.type === filterType;
+      return matchesSearch && matchesFilter;
+    });
+  }, [searchTerm, filterType]);
 
   // Get unique document types for filter
   const documentTypes = useMemo(() => {
-    const types = Array.from(new Set(availableDocuments.map(doc => doc.type)))
-    return types.sort((a, b) => documentTypeConfig[a].priority - documentTypeConfig[b].priority)
-  }, [])
+    const types = Array.from(new Set(availableDocuments.map(doc => doc.type)));
+    console.log('Document types:', types);
+    types.forEach(type => {
+      if (!documentTypeConfig[type]) {
+        console.warn(`Missing documentTypeConfig for type: ${type}`);
+      }
+    });
+    return types.sort((a, b) => {
+      const priorityA = documentTypeConfig[a]?.priority ?? 99;
+      const priorityB = documentTypeConfig[b]?.priority ?? 99;
+      return priorityA - priorityB;
+    });
+  }, []);
 
   // Check if document is selected
   const isDocumentSelected = (documentId: string): boolean => {
-    return selectedDocuments.some(doc => doc.document.id === documentId && doc.selected)
-  }
+    return selectedDocuments.some(doc => doc.document.id === documentId && doc.selected);
+  };
 
   // Toggle document selection
   const toggleDocument = (document: typeof availableDocuments[0]) => {
-    const isSelected = isDocumentSelected(document.id)
+    const isSelected = isDocumentSelected(document.id);
+    console.log('Toggling document:', document.name, { isSelected });
     
     if (isSelected) {
       // Remove document
-      const updated = selectedDocuments.filter(doc => doc.document.id !== document.id)
-      onUpdateSelectedDocuments(updated)
+      const updated = selectedDocuments.filter(doc => doc.document.id !== document.id);
+      onUpdateSelectedDocuments(updated);
     } else {
       // Add document
       const newSelectedDoc: SelectedDocument = {
@@ -67,16 +68,16 @@ export default function DocumentSelection({
         document,
         order: selectedDocuments.length,
         selected: true,
-      }
-      onUpdateSelectedDocuments([...selectedDocuments, newSelectedDoc])
+      };
+      onUpdateSelectedDocuments([...selectedDocuments, newSelectedDoc]);
     }
-  }
+  };
 
   // Get selected count
-  const selectedCount = selectedDocuments.filter(doc => doc.selected).length
+  const selectedCount = selectedDocuments.filter(doc => doc.selected).length;
 
   // Check if can proceed
-  const canProceed = selectedCount > 0
+  const canProceed = selectedCount > 0;
 
   return (
     <motion.div
@@ -91,10 +92,10 @@ export default function DocumentSelection({
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
             className="w-16 h-16 bg-gradient-secondary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg"
           >
-            <DocumentDuplicateIcon className="w-8 h-8 text-white" />
+            <span className="text-white font-bold">Docs</span>
           </motion.div>
           <h2 className="text-3xl font-bold font-display text-gray-900 dark:text-white mb-3">
             Select Documents
@@ -109,36 +110,34 @@ export default function DocumentSelection({
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
           {/* Search */}
           <div className="flex-1 relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               placeholder="Search documents..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="form-input pl-10 w-full"
+              className="form-input w-full pl-4"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                <XMarkIcon className="w-5 h-5" />
+                Clear
               </button>
             )}
           </div>
 
           {/* Filter */}
           <div className="relative">
-            <FunnelIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value as DocumentType | 'all')}
-              className="form-input pl-10 pr-10 min-w-48"
+              className="form-input pl-4 pr-10 min-w-48"
             >
               <option value="all">All Types</option>
               {documentTypes.map(type => (
                 <option key={type} value={type}>
-                  {documentTypeConfig[type].icon} {type}
+                  {type}
                 </option>
               ))}
             </select>
@@ -167,32 +166,12 @@ export default function DocumentSelection({
           </p>
         </motion.div>
 
-        {/* Warning about encrypted PDFs */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800"
-        >
-          <div className="flex items-start gap-3">
-            <span className="text-amber-500 text-lg font-bold">!</span>
-            <div>
-              <h3 className="font-medium text-amber-900 dark:text-amber-100 mb-1">
-                Note about PDF Processing
-              </h3>
-              <p className="text-sm text-amber-700 dark:text-amber-300">
-                If any selected PDFs are encrypted or password-protected, they will be replaced with error pages in the final packet. 
-                For best results, ensure all PDFs are unencrypted and accessible.
-              </p>
-            </div>
-          </div>
-        </motion.div>
-
         {/* Documents Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <AnimatePresence>
             {filteredDocuments.map((document, index) => {
-              const isSelected = isDocumentSelected(document.id)
-              const config = documentTypeConfig[document.type]
+              const isSelected = isDocumentSelected(document.id);
+              const config = documentTypeConfig[document.type] || { color: 'gray', priority: 99 }; // Fallback config
               
               return (
                 <motion.div
@@ -204,11 +183,11 @@ export default function DocumentSelection({
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -4 }}
                   className={cn(
-                    "relative cursor-pointer transition-all duration-300",
-                    "border-2 rounded-xl p-6 bg-white dark:bg-gray-800",
+                    'relative cursor-pointer transition-all duration-300',
+                    'border-2 rounded-xl p-6 bg-white dark:bg-gray-800',
                     isSelected 
-                      ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-lg" 
-                      : "border-gray-200 dark:border-gray-700 hover:border-primary-300 hover:shadow-md"
+                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-lg' 
+                      : 'border-gray-200 dark:border-gray-700 hover:border-primary-300 hover:shadow-md'
                   )}
                   onClick={() => toggleDocument(document)}
                 >
@@ -217,19 +196,18 @@ export default function DocumentSelection({
                     <motion.div
                       initial={false}
                       animate={{ scale: isSelected ? 1 : 0 }}
-                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                     >
-                      <CheckCircleIcon className="w-6 h-6 text-primary-500" />
+                      <span className="text-primary-500 font-bold">Selected</span>
                     </motion.div>
                   </div>
 
                   {/* Document Type Badge */}
                   <div className={cn(
-                    "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mb-4",
+                    'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mb-4',
                     `bg-${config.color}-100 text-${config.color}-700`,
                     `dark:bg-${config.color}-900/20 dark:text-${config.color}-300`
                   )}>
-                    <span className="mr-1">{config.icon}</span>
                     {document.type}
                   </div>
 
@@ -252,13 +230,14 @@ export default function DocumentSelection({
                     initial={{ opacity: 0 }}
                     whileHover={{ opacity: 1 }}
                     onClick={(e) => {
-                      e.stopPropagation()
-                      window.open(document.url, '_blank')
+                      e.stopPropagation();
+                      console.log('Previewing document:', document.url);
+                      window.open(document.url, '_blank');
                     }}
                     className="absolute bottom-4 right-4 btn btn-primary btn-sm opacity-0 hover:opacity-100 transition-opacity"
                     title="Preview PDF"
                   >
-                    <EyeIcon className="w-4 h-4" />
+                    Preview
                   </motion.button>
 
                   {/* Hover Overlay */}
@@ -268,7 +247,7 @@ export default function DocumentSelection({
                     className="absolute inset-0 bg-primary-500/5 rounded-xl pointer-events-none"
                   />
                 </motion.div>
-              )
+              );
             })}
           </AnimatePresence>
         </div>
@@ -280,7 +259,6 @@ export default function DocumentSelection({
             animate={{ opacity: 1 }}
             className="text-center py-12"
           >
-            <DocumentDuplicateIcon className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               No documents found
             </h3>
@@ -293,30 +271,34 @@ export default function DocumentSelection({
         {/* Navigation */}
         <div className="flex justify-between pt-8 border-t border-gray-200 dark:border-gray-700">
           <motion.button
-            onClick={onPrevious}
+            onClick={() => {
+              console.log('Navigating back to form');
+              onPrevious();
+            }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="btn btn-outline btn-lg"
           >
-            <ArrowLeftIcon className="w-5 h-5 mr-2" />
             Back to Form
           </motion.button>
 
           <motion.button
-            onClick={onNext}
+            onClick={() => {
+              console.log('Navigating to arrange documents', { selectedCount });
+              onNext();
+            }}
             disabled={!canProceed}
             whileHover={canProceed ? { scale: 1.02 } : {}}
             whileTap={canProceed ? { scale: 0.98 } : {}}
             className={cn(
-              "btn btn-primary btn-lg min-w-48",
-              !canProceed && "opacity-50 cursor-not-allowed"
+              'btn btn-primary btn-lg min-w-48',
+              !canProceed && 'opacity-50 cursor-not-allowed'
             )}
           >
             Arrange Documents
-            <ArrowRightIcon className="w-5 h-5 ml-2" />
           </motion.button>
         </div>
       </div>
     </motion.div>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import type { ProjectFormData, SelectedDocument } from '@/types'
+import type { ProjectFormData, SelectedDocument, Document } from '@/types'
 
 // Server-side PDF processing using Cloudflare Workers
 export class PDFService {
@@ -32,8 +32,11 @@ export class PDFService {
           projectName: formData.projectName || 'Untitled Project',
           submittedTo: formData.submittedTo || 'N/A',
           preparedBy: formData.preparedBy || 'N/A',
-          product: formData.product || 'N/A',
           date: formData.date || new Date().toLocaleDateString(),
+          projectNumber: formData.projectNumber || 'N/A', // Optional field
+          emailAddress: formData.emailAddress || 'N/A',
+          phoneNumber: formData.phoneNumber || 'N/A',
+          status: formData.status || 'N/A',
         },
         documents: sortedDocs.map(doc => ({
           id: doc.id,
@@ -77,6 +80,22 @@ export class PDFService {
     }
   }
 
+  /**
+   * Fetch document metadata dynamically
+   */
+  async fetchDocuments(): Promise<Document[]> {
+    try {
+      const response = await fetch('/documents.json')
+      if (!response.ok) {
+        throw new Error(`Failed to fetch documents: ${response.status} ${response.statusText}`)
+      }
+      const documents = await response.json()
+      return documents
+    } catch (error) {
+      console.error('Error fetching documents:', error)
+      throw new Error(`Failed to fetch document metadata: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
 
   /**
    * Download PDF to user's device
