@@ -33,15 +33,37 @@ export class PDFService {
           submittedTo: formData.submittedTo || 'N/A',
           preparedBy: formData.preparedBy || 'N/A',
           date: formData.date || new Date().toLocaleDateString(),
-          projectNumber: formData.projectNumber || 'N/A', // Optional field
+          projectNumber: formData.projectNumber || 'N/A',
           emailAddress: formData.emailAddress || 'N/A',
           phoneNumber: formData.phoneNumber || 'N/A',
-          status: formData.status || 'N/A',
+          product: formData.product || '3/4-in (20mm)',
+          status: formData.status || {
+            forReview: false,
+            forApproval: false,
+            forRecord: false,
+            forInformationOnly: false,
+          },
+          submittalType: formData.submittalType || {
+            tds: false,
+            threePartSpecs: false,
+            testReportIccEsr5194: false,
+            testReportIccEsl1645: false,
+            fireAssembly: false,
+            fireAssembly01: false,
+            fireAssembly02: false,
+            fireAssembly03: false,
+            msds: false,
+            leedGuide: false,
+            installationGuide: false,
+            warranty: false,
+            samples: false,
+            other: false,
+          },
         },
         documents: sortedDocs.map(doc => ({
           id: doc.id,
           name: doc.document.name,
-          url: doc.document.url, // Let worker handle URL conversion
+          url: doc.document.url,
           type: doc.document.type,
         }))
       }
@@ -76,6 +98,15 @@ export class PDFService {
 
     } catch (error) {
       console.error('Error generating packet:', error)
+
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        throw new Error(
+          `Cannot connect to PDF Worker at ${this.workerUrl}. ` +
+          `Please ensure the worker is running by executing 'npm run dev' in the project root, ` +
+          `which will start both the frontend and worker simultaneously.`
+        )
+      }
+
       throw new Error(`Failed to generate PDF packet: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }

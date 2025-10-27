@@ -38,8 +38,30 @@ const PacketGeneration = ({
         ...formData,
         emailAddress: formData.emailAddress || '',
         phoneNumber: formData.phoneNumber || '',
-        status: formData.status || '',
-        date: formData.date || new Date().toLocaleDateString(), // Ensure date is always present
+        product: formData.product || '3/4-in (20mm)',
+        status: formData.status || {
+          forReview: false,
+          forApproval: false,
+          forRecord: false,
+          forInformationOnly: false,
+        },
+        submittalType: formData.submittalType || {
+          tds: false,
+          threePartSpecs: false,
+          testReportIccEsr5194: false,
+          testReportIccEsl1645: false,
+          fireAssembly: false,
+          fireAssembly01: false,
+          fireAssembly02: false,
+          fireAssembly03: false,
+          msds: false,
+          leedGuide: false,
+          installationGuide: false,
+          warranty: false,
+          samples: false,
+          other: false,
+        },
+        date: formData.date || new Date().toLocaleDateString(),
       };
       console.log('Prepared form data for PDF:', preparedFormData); // Debug output
       const pdfBytes = await pdfService.generatePacket(preparedFormData, sortedDocs);
@@ -62,7 +84,29 @@ const PacketGeneration = ({
         ...formData,
         emailAddress: formData.emailAddress || '',
         phoneNumber: formData.phoneNumber || '',
-        status: formData.status || '',
+        product: formData.product || '3/4-in (20mm)',
+        status: formData.status || {
+          forReview: false,
+          forApproval: false,
+          forRecord: false,
+          forInformationOnly: false,
+        },
+        submittalType: formData.submittalType || {
+          tds: false,
+          threePartSpecs: false,
+          testReportIccEsr5194: false,
+          testReportIccEsl1645: false,
+          fireAssembly: false,
+          fireAssembly01: false,
+          fireAssembly02: false,
+          fireAssembly03: false,
+          msds: false,
+          leedGuide: false,
+          installationGuide: false,
+          warranty: false,
+          samples: false,
+          other: false,
+        },
         date: formData.date || new Date().toLocaleDateString(),
       };
       console.log('Prepared form data for preview:', preparedFormData); // Debug output
@@ -137,7 +181,7 @@ const PacketGeneration = ({
               <p>Phone Number: {formData.phoneNumber || ''}</p>
               <p>Project Number: {formData.projectNumber || 'N/A'}</p>
               <p>Date: {formData.date || new Date().toLocaleDateString()}</p>
-              <p>Status: {formData.status || ''}</p>
+              <p>Status: {formData.status ? Object.entries(formData.status).filter(([_, v]) => v).map(([k]) => k.replace(/([A-Z])/g, ' $1').trim()).join(', ') : 'N/A'}</p>
             </div>
             <h4 className="text-lg font-medium text-gray-900 dark:text-white mt-4 mb-3">Documents ({sortedDocs.length})</h4>
             <div className="space-y-2">
