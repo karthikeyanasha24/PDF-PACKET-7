@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { pdfService } from '@/services/pdfService';
 import type { SelectedDocument, ProjectFormData } from '@/types';
 import { cn, formatFileSize } from '@/utils';
-import { documentTypeConfig } from '@/data/documents';
 
 interface PacketGenerationProps {
   selectedDocuments: SelectedDocument[];

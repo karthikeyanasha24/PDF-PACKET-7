@@ -1,10 +1,9 @@
 import { motion } from 'framer-motion'
-import { 
-  DocumentTextIcon, 
-  DocumentDuplicateIcon, 
-  Bars3BottomLeftIcon, 
+import {
+  DocumentTextIcon,
+  Bars3BottomLeftIcon,
   CloudArrowDownIcon,
-  CheckCircleIcon 
+  CheckCircleIcon
 } from '@heroicons/react/24/outline'
 import { cn } from '@/utils'
 import type { ProjectFormData, SelectedDocument } from '@/types'
@@ -27,24 +26,25 @@ interface Step {
 const steps: Step[] = [
   {
     id: 1,
-    title: 'Project Details & Documents',
-    description: 'Enter project information and select documents',
+    title: 'Project Details',
+    description: 'Enter project information',
     icon: DocumentTextIcon,
-    isComplete: (formData, selectedDocuments) => {
+    isComplete: (formData) => {
       return !!(
         formData.submittedTo &&
         formData.projectName &&
         formData.preparedBy &&
         formData.emailAddress &&
-        formData.status &&
-        selectedDocuments.some(doc => doc.selected)
+        formData.phoneNumber &&
+        formData.date &&
+        formData.status
       )
     },
   },
   {
     id: 2,
-    title: 'Arrange Order',
-    description: 'Organize documents in your preferred sequence',
+    title: 'Select & Arrange Documents',
+    description: 'Choose and organize documents for your packet',
     icon: Bars3BottomLeftIcon,
     isComplete: (_, selectedDocuments) => {
       return selectedDocuments.some(doc => doc.selected)
