@@ -27,31 +27,22 @@ interface Step {
 const steps: Step[] = [
   {
     id: 1,
-    title: 'Project Details',
-    description: 'Enter project information and specifications',
+    title: 'Project Details & Documents',
+    description: 'Enter project information and select documents',
     icon: DocumentTextIcon,
-    isComplete: (formData) => {
+    isComplete: (formData, selectedDocuments) => {
       return !!(
         formData.submittedTo &&
         formData.projectName &&
         formData.preparedBy &&
-        formData.email &&
-        formData.status
-        
+        formData.emailAddress &&
+        formData.status &&
+        selectedDocuments.some(doc => doc.selected)
       )
     },
   },
   {
     id: 2,
-    title: 'Select Documents',
-    description: 'Choose which documents to include',
-    icon: DocumentDuplicateIcon,
-    isComplete: (_, selectedDocuments) => {
-      return selectedDocuments.some(doc => doc.selected)
-    },
-  },
-  {
-    id: 3,
     title: 'Arrange Order',
     description: 'Organize documents in your preferred sequence',
     icon: Bars3BottomLeftIcon,
@@ -60,11 +51,11 @@ const steps: Step[] = [
     },
   },
   {
-    id: 4,
+    id: 3,
     title: 'Generate Packet',
     description: 'Create and download your PDF packet',
     icon: CloudArrowDownIcon,
-    isComplete: () => false, // This step is never "complete" until generation
+    isComplete: () => false,
   },
 ]
 
@@ -261,7 +252,7 @@ export default function StepWizard({
         <motion.div
           className="h-full bg-gradient-to-r from-primary-500 to-primary-600 rounded-full"
           initial={{ width: 0 }}
-          animate={{ width: `${(currentStep / steps.length) * 100}%` }}
+          animate={{ width: `${(currentStep / 3) * 100}%` }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         />
       </motion.div>

@@ -1,12 +1,15 @@
 import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { cn, getUniqueProducts } from '@/utils';
-import type { ProjectFormData, SelectedDocument } from '@/types';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn, getUniqueProducts, formatFileSize, generateId } from '@/utils';
+import { availableDocuments, documentTypeConfig } from '@/data/documents';
+import PacketStats from '@/components/PacketStats';
+import type { ProjectFormData, SelectedDocument, DocumentType } from '@/types';
 
 interface ProjectFormProps {
   formData: Partial<ProjectFormData>;
   selectedDocuments: SelectedDocument[];
   onUpdateFormData: (data: Partial<ProjectFormData>) => void;
+  onUpdateSelectedDocuments: (documents: SelectedDocument[]) => void;
   onNext: () => void;
 }
 
@@ -14,6 +17,7 @@ export default function ProjectForm({
   formData,
   selectedDocuments,
   onUpdateFormData,
+  onUpdateSelectedDocuments,
   onNext,
 }: ProjectFormProps) {
   const [projectName, setProjectName] = useState(formData.projectName || '');
@@ -25,6 +29,9 @@ export default function ProjectForm({
   const [projectNumber, setProjectNumber] = useState(formData.projectNumber || '');
   const [emailAddress, setEmailAddress] = useState(formData.emailAddress || '');
   const [phoneNumber, setPhoneNumber] = useState(formData.phoneNumber || '');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState<DocumentType | 'all'>('all');
+
   const availableProducts = useMemo(() => {
     const selectedDocs = selectedDocuments
       .filter(doc => doc.selected)
@@ -50,32 +57,56 @@ export default function ProjectForm({
   const [statusForRecord, setStatusForRecord] = useState(formData.status?.forRecord || false);
   const [statusForInformationOnly, setStatusForInformationOnly] = useState(formData.status?.forInformationOnly || false);
 
-  // Submittal Type checkboxes
-  const [tds, setTds] = useState(formData.submittalType?.tds || false);
-  const [threePartSpecs, setThreePartSpecs] = useState(formData.submittalType?.threePartSpecs || false);
-  const [testReportIccEsr5194, setTestReportIccEsr5194] = useState(formData.submittalType?.testReportIccEsr5194 || false);
-  const [testReportIccEsl1645, setTestReportIccEsl1645] = useState(formData.submittalType?.testReportIccEsl1645 || false);
-  const [fireAssembly, setFireAssembly] = useState(formData.submittalType?.fireAssembly || false);
-  const [fireAssembly01, setFireAssembly01] = useState(formData.submittalType?.fireAssembly01 || false);
-  const [fireAssembly02, setFireAssembly02] = useState(formData.submittalType?.fireAssembly02 || false);
-  const [fireAssembly03, setFireAssembly03] = useState(formData.submittalType?.fireAssembly03 || false);
-  const [msds, setMsds] = useState(formData.submittalType?.msds || false);
-  const [leedGuide, setLeedGuide] = useState(formData.submittalType?.leedGuide || false);
-  const [installationGuide, setInstallationGuide] = useState(formData.submittalType?.installationGuide || false);
-  const [warranty, setWarranty] = useState(formData.submittalType?.warranty || false);
-  const [samples, setSamples] = useState(formData.submittalType?.samples || false);
-  const [other, setOther] = useState(formData.submittalType?.other || false);
-  const [otherText, setOtherText] = useState(formData.submittalType?.otherText || '');
-
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  // Filter and search documents
+  const filteredDocuments = useMemo(() => {
+    return availableDocuments.filter(doc => {
+      const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           doc.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesFilter = filterType === 'all' || doc.type === filterType;
+      return matchesSearch && matchesFilter;
+    });
+  }, [searchTerm, filterType]);
+
+  // Get unique document types for filter
+  const documentTypes = useMemo(() => {
+    const types = Array.from(new Set(availableDocuments.map(doc => doc.type)));
+    return types.sort((a, b) => {
+      const priorityA = documentTypeConfig[a]?.priority ?? 99;
+      const priorityB = documentTypeConfig[b]?.priority ?? 99;
+      return priorityA - priorityB;
+    });
+  }, []);
+
+  // Check if document is selected
+  const isDocumentSelected = (documentId: string): boolean => {
+    return selectedDocuments.some(doc => doc.document.id === documentId && doc.selected);
+  };
+
+  // Toggle document selection
+  const toggleDocument = (document: typeof availableDocuments[0]) => {
+    const isSelected = isDocumentSelected(document.id);
+
+    if (isSelected) {
+      const updated = selectedDocuments.filter(doc => doc.document.id !== document.id);
+      onUpdateSelectedDocuments(updated);
+    } else {
+      const newSelectedDoc: SelectedDocument = {
+        id: generateId(),
+        document,
+        order: selectedDocuments.length,
+        selected: true,
+      };
+      onUpdateSelectedDocuments([...selectedDocuments, newSelectedDoc]);
+    }
+  };
+
+  // Get selected count
+  const selectedCount = selectedDocuments.filter(doc => doc.selected).length;
 
   // Check if at least one status is selected
   const isStatusValid = statusForReview || statusForApproval || statusForRecord || statusForInformationOnly;
-
-  // Check if at least one submittal type is selected
-  const isSubmittalTypeValid = tds || threePartSpecs || testReportIccEsr5194 || testReportIccEsl1645 ||
-    fireAssembly || fireAssembly01 || fireAssembly02 || fireAssembly03 || msds ||
-    leedGuide || installationGuide || warranty || samples || other;
 
   // Check if form is valid
   const isFormValid =
@@ -86,7 +117,7 @@ export default function ProjectForm({
     emailAddress.trim() !== '' &&
     phoneNumber.trim() !== '' &&
     isStatusValid &&
-    isSubmittalTypeValid;
+    selectedCount > 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,7 +130,7 @@ export default function ProjectForm({
     if (!emailAddress.trim()) newErrors.emailAddress = 'Email Address is required';
     if (!phoneNumber.trim()) newErrors.phoneNumber = 'Phone Number is required';
     if (!isStatusValid) newErrors.status = 'Please select at least one status option';
-    if (!isSubmittalTypeValid) newErrors.submittalType = 'Please select at least one submittal type';
+    if (selectedCount === 0) newErrors.documents = 'Please select at least one document';
 
     setErrors(newErrors);
 
@@ -118,23 +149,6 @@ export default function ProjectForm({
           forApproval: statusForApproval,
           forRecord: statusForRecord,
           forInformationOnly: statusForInformationOnly,
-        },
-        submittalType: {
-          tds,
-          threePartSpecs,
-          testReportIccEsr5194,
-          testReportIccEsl1645,
-          fireAssembly,
-          fireAssembly01,
-          fireAssembly02,
-          fireAssembly03,
-          msds,
-          leedGuide,
-          installationGuide,
-          warranty,
-          samples,
-          other,
-          otherText,
         },
       });
       onNext();
@@ -351,167 +365,146 @@ export default function ProjectForm({
             )}
           </div>
 
-          {/* Submittal Type Section */}
+          {/* Document Selection Section */}
           <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Submittal Type (check all that apply) <span className="text-red-500">*</span>
+              Select Documents <span className="text-red-500">*</span>
             </h3>
-            <div className="space-y-3">
-              <label className="flex items-center space-x-2 cursor-pointer">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              Choose which documents to include in your PDF packet. You'll arrange their order in the next step.
+            </p>
+
+            {/* Search and Filter */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="flex-1 relative">
                 <input
-                  type="checkbox"
-                  checked={tds}
-                  onChange={(e) => setTds(e.target.checked)}
-                  className="w-5 h-5 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
+                  type="text"
+                  placeholder="Search documents..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="form-input w-full pl-4 bg-white dark:bg-gray-700"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">TDS</span>
-              </label>
-
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={threePartSpecs}
-                  onChange={(e) => setThreePartSpecs(e.target.checked)}
-                  className="w-5 h-5 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">3-Part Specs</span>
-              </label>
-
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={testReportIccEsr5194}
-                  onChange={(e) => setTestReportIccEsr5194(e.target.checked)}
-                  className="w-5 h-5 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Test Report ICC-ESR 5194</span>
-              </label>
-
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={testReportIccEsl1645}
-                  onChange={(e) => setTestReportIccEsl1645(e.target.checked)}
-                  className="w-5 h-5 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Test Report ICC-ESL 1645</span>
-              </label>
-
-              <div>
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={fireAssembly}
-                    onChange={(e) => setFireAssembly(e.target.checked)}
-                    className="w-5 h-5 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
-                  />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Fire Assembly</span>
-                </label>
-
-                {/* Nested Fire Assembly options */}
-                <div className="ml-8 mt-2 space-y-2">
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={fireAssembly01}
-                      onChange={(e) => setFireAssembly01(e.target.checked)}
-                      className="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Fire Assembly 01</span>
-                  </label>
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={fireAssembly02}
-                      onChange={(e) => setFireAssembly02(e.target.checked)}
-                      className="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Fire Assembly 02</span>
-                  </label>
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={fireAssembly03}
-                      onChange={(e) => setFireAssembly03(e.target.checked)}
-                      className="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Fire Assembly 03</span>
-                  </label>
-                </div>
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm"
+                  >
+                    Clear
+                  </button>
+                )}
               </div>
 
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={msds}
-                  onChange={(e) => setMsds(e.target.checked)}
-                  className="w-5 h-5 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Material Safety Data Sheet (MSDS)</span>
-              </label>
-
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={leedGuide}
-                  onChange={(e) => setLeedGuide(e.target.checked)}
-                  className="w-5 h-5 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">LEED Guide</span>
-              </label>
-
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={installationGuide}
-                  onChange={(e) => setInstallationGuide(e.target.checked)}
-                  className="w-5 h-5 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Installation Guide</span>
-              </label>
-
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={warranty}
-                  onChange={(e) => setWarranty(e.target.checked)}
-                  className="w-5 h-5 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Warranty</span>
-              </label>
-
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={samples}
-                  onChange={(e) => setSamples(e.target.checked)}
-                  className="w-5 h-5 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Samples</span>
-              </label>
-
-              <div className="flex items-start space-x-2">
-                <input
-                  type="checkbox"
-                  checked={other}
-                  onChange={(e) => setOther(e.target.checked)}
-                  className="w-5 h-5 mt-1 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500"
-                />
-                <div className="flex-1">
-                  <label className="text-sm text-gray-700 dark:text-gray-300 mb-2 block cursor-pointer">Other:</label>
-                  <input
-                    type="text"
-                    value={otherText}
-                    onChange={(e) => setOtherText(e.target.value)}
-                    placeholder="Specify other submittal type"
-                    className="form-input bg-white dark:bg-gray-700 w-full"
-                    disabled={!other}
-                  />
-                </div>
+              <div className="relative">
+                <select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value as DocumentType | 'all')}
+                  className="form-input pl-4 pr-10 min-w-48 bg-white dark:bg-gray-700"
+                >
+                  <option value="all">All Types</option>
+                  {documentTypes.map(type => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
-            {errors.submittalType && (
-              <p className="text-red-500 text-sm mt-2">{errors.submittalType}</p>
+
+            {/* Selected Count */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mb-6 p-4 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
+            >
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {selectedCount} document{selectedCount !== 1 ? 's' : ''} selected
+                {selectedCount > 0 && (
+                  <span className="ml-2 text-cyan-600 dark:text-cyan-400">
+                    ✓ Ready to proceed
+                  </span>
+                )}
+              </p>
+            </motion.div>
+
+            {/* Documents Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+              <AnimatePresence>
+                {filteredDocuments.map((document, index) => {
+                  const isSelected = isDocumentSelected(document.id);
+                  const config = documentTypeConfig[document.type] || { color: 'gray', priority: 99 };
+
+                  return (
+                    <motion.div
+                      key={document.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ delay: index * 0.05 }}
+                      className={cn(
+                        'relative cursor-pointer transition-all duration-200',
+                        'border-2 rounded-lg p-4 bg-white dark:bg-gray-700',
+                        isSelected
+                          ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 shadow-md'
+                          : 'border-gray-200 dark:border-gray-600 hover:border-cyan-300 hover:shadow-sm'
+                      )}
+                      onClick={() => toggleDocument(document)}
+                    >
+                      {/* Selection Indicator */}
+                      <div className="absolute top-3 right-3">
+                        <motion.div
+                          initial={false}
+                          animate={{ scale: isSelected ? 1 : 0 }}
+                          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                          className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center"
+                        >
+                          <span className="text-white text-xs">✓</span>
+                        </motion.div>
+                      </div>
+
+                      {/* Document Type Badge */}
+                      <div className="inline-flex items-center px-2 py-1 rounded text-xs font-medium mb-2 bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-200">
+                        {document.type}
+                      </div>
+
+                      {/* Document Info */}
+                      <h4 className="font-medium text-sm text-gray-900 dark:text-white mb-1 pr-8">
+                        {document.name}
+                      </h4>
+                      <p className="text-xs text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">
+                        {document.description}
+                      </p>
+
+                      {/* File Info */}
+                      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                        <span>{formatFileSize(document.size || 0)}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(document.url, '_blank');
+                          }}
+                          className="text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 hover:underline"
+                        >
+                          Preview
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+
+            {/* No Results */}
+            {filteredDocuments.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-gray-500 dark:text-gray-400">
+                  No documents found. Try adjusting your search or filter.
+                </p>
+              </div>
+            )}
+
+            {errors.documents && (
+              <p className="text-red-500 text-sm mt-4">{errors.documents}</p>
             )}
           </div>
 
@@ -567,7 +560,7 @@ export default function ProjectForm({
               !isFormValid && 'opacity-50 cursor-not-allowed'
             )}
           >
-            Select Documents
+            Arrange Documents
           </motion.button>
         </div>
       </div>

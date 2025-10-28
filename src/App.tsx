@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Layout from '@/components/Layout'
 import StepWizard from '@/components/StepWizard'
 import ProjectForm from '@/components/steps/ProjectForm'
-import DocumentSelection from '@/components/steps/DocumentSelection'
 import DocumentOrdering from '@/components/steps/DocumentOrdering'
 import PacketGeneration from '@/components/steps/PacketGeneration'
 import ThemeProvider from '@/components/ThemeProvider'
@@ -64,7 +63,7 @@ function App() {
   const nextStep = () => {
     setAppState(prev => ({
       ...prev,
-      currentStep: Math.min(prev.currentStep + 1, 4)
+      currentStep: Math.min(prev.currentStep + 1, 3)
     }))
   }
 
@@ -106,9 +105,8 @@ function App() {
 
   const stepComponents = {
     1: ProjectForm,
-    2: DocumentSelection,
-    3: DocumentOrdering,
-    4: PacketGeneration,
+    2: DocumentOrdering,
+    3: PacketGeneration,
   }
 
   return (
@@ -188,7 +186,7 @@ function App() {
                     className="fixed bottom-6 right-6 z-50"
                   >
                     <div className="glass-card dark:glass-card-dark p-4 text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Step {appState.currentStep} of 4
+                      Step {appState.currentStep} of 3
                     </div>
                   </motion.div>
                 </div>
