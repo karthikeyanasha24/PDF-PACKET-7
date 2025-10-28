@@ -349,10 +349,10 @@ async function addCoverPage(pdf: PDFDocument, projectData: ProjectData) {
       });
 
       // X mark
-      page.drawText('✓', {
-        x: x + 2,
+      page.drawText('X', {
+        x: x + 3,
         y: y + 2,
-        size: 10,
+        size: 9,
         font: boldFont,
         color: rgb(1, 1, 1),
       });
