@@ -7,7 +7,8 @@
     "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/TDS%20-%20MAXTERRA%C2%AE%20MgO%20Non-Combustible%20Single%20Layer%20Structural%20Floor%20Panels%2001-14-25%20Version%201.2%20Email%20(1)%20(1).pdf",
     "size": 1769344,
     "type": "TDS",
-    "required": false
+    "required": false,
+    "products": ["3/4-in (20mm)", "1-in (25mm)", "1-1/8-in (28mm)"]
   },
   {
     "id": "msds-safety",
@@ -17,7 +18,8 @@
     "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/MSDS%20-%20MAXTERRA%E2%84%A2%20MgO%20Non-Combustible%20Single%20Layer%20Structural%20Floor%20Panels%20-%20Version%201%20Sept%202024.pdf",
     "size": 300088,
     "type": "MSDS",
-    "required": false
+    "required": false,
+    "products": ["3/4-in (20mm)", "1-in (25mm)", "1-1/8-in (28mm)"]
   },
   {
     "id": "leed-credit-guide",
@@ -27,7 +29,8 @@
     "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/LEED%20Credit%20Guide%207-16-25%20(1).pdf",
     "size": 522459,
     "type": "LEED",
-    "required": false
+    "required": false,
+    "products": ["3/4-in (20mm)", "1-in (25mm)", "1-1/8-in (28mm)"]
   },
   {
     "id": "installation-guide",
@@ -37,7 +40,8 @@
     "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/Installation%20Guide%20-%20MAXTERRA%E2%84%A2%20MgO%20Non-Combustible%20Single-Layer%20Subfloor%20-%20V%201.02.pdf",
     "size": 2699385,
     "type": "Installation",
-    "required": false
+    "required": false,
+    "products": ["3/4-in (20mm)", "1-in (25mm)", "1-1/8-in (28mm)"]
   },
   {
     "id": "limited-warranty",
@@ -47,7 +51,8 @@
     "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/Limited%20Warranty%20-%208-31-2023.pdf",
     "size": 123375,
     "type": "Warranty",
-    "required": false
+    "required": false,
+    "products": ["3/4-in (20mm)", "1-in (25mm)", "1-1/8-in (28mm)"]
   },
   {
     "id": "acoustic-certification",
@@ -57,7 +62,8 @@
     "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/ESL-1645%20Certified%20FloorCeiling%20Acoustical%20Performance%20-%20June%202025%20(2).pdf",
     "size": 535035,
     "type": "Acoustic",
-    "required": false
+    "required": false,
+    "products": ["3/4-in (20mm)", "1-in (25mm)", "1-1/8-in (28mm)"]
   },
   {
     "id": "esr-5194",
@@ -67,6 +73,7 @@
     "url": "https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-6/main/public/PDFS/ESR-5194%20-%20MAXTERRA%E2%84%A2%20MgO%20Non-Combustible%20Single%20Layer%20Structural%20Floor%20Panels%20-%20June%202024%20(4)%20(1).pdf",
     "size": 660331,
     "type": "ESR",
-    "required": false
+    "required": false,
+    "products": ["3/4-in (20mm)", "1-in (25mm)", "1-1/8-in (28mm)"]
   }
 ]

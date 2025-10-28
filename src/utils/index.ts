@@ -205,3 +205,11 @@ export function reorderArray<T>(array: T[], startIndex: number, endIndex: number
   result.splice(endIndex, 0, removed)
   return result
 }
+
+export function getUniqueProducts(documents: any[]): string[] {
+  const allProducts = documents
+    .filter(doc => doc.products && Array.isArray(doc.products))
+    .flatMap(doc => doc.products)
+
+  return Array.from(new Set(allProducts)).sort()
+}

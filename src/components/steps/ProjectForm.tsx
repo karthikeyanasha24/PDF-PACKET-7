@@ -1,16 +1,18 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { cn } from '@/utils';
-import type { ProjectFormData } from '@/types';
+import { cn, getUniqueProducts } from '@/utils';
+import type { ProjectFormData, SelectedDocument } from '@/types';
 
 interface ProjectFormProps {
   formData: Partial<ProjectFormData>;
+  selectedDocuments: SelectedDocument[];
   onUpdateFormData: (data: Partial<ProjectFormData>) => void;
   onNext: () => void;
 }
 
 export default function ProjectForm({
   formData,
+  selectedDocuments,
   onUpdateFormData,
   onNext,
 }: ProjectFormProps) {
@@ -23,7 +25,24 @@ export default function ProjectForm({
   const [projectNumber, setProjectNumber] = useState(formData.projectNumber || '');
   const [emailAddress, setEmailAddress] = useState(formData.emailAddress || '');
   const [phoneNumber, setPhoneNumber] = useState(formData.phoneNumber || '');
-  const [product, setProduct] = useState(formData.product || '3/4-in (20mm)');
+  const availableProducts = useMemo(() => {
+    const selectedDocs = selectedDocuments
+      .filter(doc => doc.selected)
+      .map(doc => doc.document);
+
+    if (selectedDocs.length === 0) {
+      return ['3/4-in (20mm)', '1-in (25mm)', '1-1/8-in (28mm)'];
+    }
+
+    return getUniqueProducts(selectedDocs);
+  }, [selectedDocuments]);
+
+  const [product, setProduct] = useState(() => {
+    if (formData.product && availableProducts.includes(formData.product)) {
+      return formData.product;
+    }
+    return availableProducts[0] || '3/4-in (20mm)';
+  });
 
   // Status checkboxes
   const [statusForReview, setStatusForReview] = useState(formData.status?.forReview || false);
@@ -509,10 +528,17 @@ export default function ProjectForm({
                 onChange={(e) => setProduct(e.target.value)}
                 className="form-input bg-white dark:bg-gray-700"
               >
-                <option value="3/4-in (20mm)">3/4-in (20mm)</option>
-                <option value="1-in (25mm)">1-in (25mm)</option>
-                <option value="1-1/8-in (28mm)">1-1/8-in (28mm)</option>
+                {availableProducts.map((productOption) => (
+                  <option key={productOption} value={productOption}>
+                    {productOption}
+                  </option>
+                ))}
               </select>
+              {selectedDocuments.filter(doc => doc.selected).length > 0 && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Product options based on selected documents
+                </p>
+              )}
             </div>
 
             <div className="mt-4 p-4 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">

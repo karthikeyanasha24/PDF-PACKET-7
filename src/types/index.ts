@@ -43,6 +43,7 @@ export interface Document {
   size: number;
   type: string;
   required: boolean;
+  products: string[];
 }
 
 export interface SelectedDocument {
