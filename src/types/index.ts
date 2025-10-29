@@ -13,6 +13,23 @@ export interface ProjectFormData {
     forRecord: boolean;
     forInformationOnly: boolean;
   };
+  submittalType: {
+    tds: boolean;
+    threePartSpecs: boolean;
+    testReportIccEsr5194: boolean;
+    testReportIccEsl1645: boolean;
+    fireAssembly: boolean;
+    fireAssembly01: boolean;
+    fireAssembly02: boolean;
+    fireAssembly03: boolean;
+    msds: boolean;
+    leedGuide: boolean;
+    installationGuide: boolean;
+    warranty: boolean;
+    samples: boolean;
+    other: boolean;
+    otherText?: string;
+  };
   product: string;
 }
 
