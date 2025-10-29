@@ -73,7 +73,7 @@ function SortableItem({ document, index, totalCount, onRemove, onMoveUp, onMoveD
       transition={{ delay: index * 0.1 }}
       className={cn(
         "bg-white dark:bg-gray-800 rounded-xl border-2 p-6 transition-all duration-200",
-        isDragging 
+        isDragging
           ? "border-primary-500 shadow-2xl scale-105 rotate-2 z-50 opacity-90 bg-opacity-90"
           : "border-gray-200 dark:border-gray-700 hover:border-primary-300 hover:shadow-md"
       )}
@@ -93,8 +93,6 @@ function SortableItem({ document, index, totalCount, onRemove, onMoveUp, onMoveD
         <div className="flex items-center justify-center w-8 h-8 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-full font-semibold text-sm">
           {index + 1}
         </div>
-
-       
 
         {/* Document Info */}
         <div className="flex-1 min-w-0">
@@ -117,8 +115,8 @@ function SortableItem({ document, index, totalCount, onRemove, onMoveUp, onMoveD
             disabled={index === 0}
             className={cn(
               "btn btn-ghost btn-sm p-2 transition-colors",
-              index === 0 
-                ? "opacity-30 cursor-not-allowed" 
+              index === 0
+                ? "opacity-30 cursor-not-allowed"
                 : "hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400"
             )}
             title="Move up"
@@ -132,8 +130,8 @@ function SortableItem({ document, index, totalCount, onRemove, onMoveUp, onMoveD
             disabled={index === totalCount - 1}
             className={cn(
               "btn btn-ghost btn-sm p-2 transition-colors",
-              index === totalCount - 1 
-                ? "opacity-30 cursor-not-allowed" 
+              index === totalCount - 1
+                ? "opacity-30 cursor-not-allowed"
                 : "hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400"
             )}
             title="Move down"
@@ -172,7 +170,6 @@ export default function DocumentOrdering({
 }: DocumentOrderingProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState<DocumentType | 'all'>('all')
-  const [showSelection, setShowSelection] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -259,7 +256,7 @@ export default function DocumentOrdering({
       const newIndex = sortedDocuments.findIndex(doc => doc.id === over.id)
 
       const reorderedDocs = arrayMove(sortedDocuments, oldIndex, newIndex)
-      
+
       // Update order property
       const updatedDocs = reorderedDocs.map((doc, index) => ({
         ...doc,
@@ -285,7 +282,7 @@ export default function DocumentOrdering({
       const newDocuments = [...sortedDocuments]
       const [movedDoc] = newDocuments.splice(currentIndex, 1)
       newDocuments.splice(currentIndex - 1, 0, movedDoc)
-      
+
       // Update orders
       const updatedDocuments = selectedDocuments.map(doc => {
         const newIndex = newDocuments.findIndex(newDoc => newDoc.id === doc.id)
@@ -305,7 +302,7 @@ export default function DocumentOrdering({
       const newDocuments = [...sortedDocuments]
       const [movedDoc] = newDocuments.splice(currentIndex, 1)
       newDocuments.splice(currentIndex + 1, 0, movedDoc)
-      
+
       // Update orders
       const updatedDocuments = selectedDocuments.map(doc => {
         const newIndex = newDocuments.findIndex(newDoc => newDoc.id === doc.id)
@@ -330,7 +327,7 @@ export default function DocumentOrdering({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="max-w-4xl mx-auto"
+      className="max-w-6xl mx-auto"
     >
       <div className="card p-8 lg:p-12">
         {/* Header */}
@@ -348,277 +345,228 @@ export default function DocumentOrdering({
             Select & Arrange Documents
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6">
-            Choose which documents to include in your packet, then arrange their order.
+            First, select the documents you want to include. Then arrange their order below.
           </p>
-          
-          {/* Action Buttons */}
-          <div className="flex justify-center gap-4 mt-6">
-            <button
-              onClick={() => setShowSelection(!showSelection)}
-              className={cn(
-                "btn btn-lg transition-all duration-200",
-                showSelection
-                  ? "btn-secondary"
-                  : "btn-primary bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
-              )}
-            >
-              <DocumentCheckIcon className="w-5 h-5 mr-2" />
-              {showSelection ? 'Show Ordering' : 'Select Documents'}
-            </button>
-          </div>
         </div>
 
         {/* Document Selection Section */}
-        <AnimatePresence mode="wait">
-          {showSelection ? (
-            <motion.div
-              key="selection"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="mb-8"
-            >
-              <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  Select Documents
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                  Choose which documents to include in your PDF packet.
-                </p>
+        <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Select Documents <span className="text-red-500">*</span>
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            Choose which documents to include in your PDF packet.
+          </p>
 
-                {/* Search and Filter */}
-                <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                  <div className="flex-1 relative">
-                    <input
-                      type="text"
-                      placeholder="Search documents..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="form-input w-full pl-4 bg-white dark:bg-gray-700"
-                    />
-                    {searchTerm && (
-                      <button
-                        onClick={() => setSearchTerm('')}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm"
-                      >
-                        Clear
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="relative">
-                    <select
-                      value={filterType}
-                      onChange={(e) => setFilterType(e.target.value as DocumentType | 'all')}
-                      className="form-input pl-4 pr-10 min-w-48 bg-white dark:bg-gray-700"
-                    >
-                      <option value="all">All Types</option>
-                      {documentTypes.map(type => (
-                        <option key={type} value={type}>
-                          {type}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Selected Count */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mb-6 p-4 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
+          {/* Search and Filter */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                placeholder="Search documents..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="form-input w-full pl-4 bg-white dark:bg-gray-700"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm"
                 >
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {sortedDocuments.length} document{sortedDocuments.length !== 1 ? 's' : ''} selected
-                    {sortedDocuments.length > 0 && (
-                      <span className="ml-2 text-cyan-600 dark:text-cyan-400">
-                        ✓ Ready to arrange
-                      </span>
-                    )}
-                  </p>
-                </motion.div>
+                  Clear
+                </button>
+              )}
+            </div>
 
-                {/* Documents Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
-                  <AnimatePresence>
-                    {filteredDocuments.map((document, index) => {
-                      const isSelected = isDocumentSelected(document.id)
-
-                      return (
-                        <motion.div
-                          key={document.id}
-                          layout
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.9 }}
-                          transition={{ delay: index * 0.05 }}
-                          className={cn(
-                            'relative cursor-pointer transition-all duration-200',
-                            'border-2 rounded-lg p-4 bg-white dark:bg-gray-700',
-                            isSelected
-                              ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 shadow-md'
-                              : 'border-gray-200 dark:border-gray-600 hover:border-cyan-300 hover:shadow-sm'
-                          )}
-                          onClick={() => toggleDocument(document)}
-                        >
-                          {/* Selection Indicator */}
-                          <div className="absolute top-3 right-3">
-                            <motion.div
-                              initial={false}
-                              animate={{ scale: isSelected ? 1 : 0 }}
-                              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                              className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center"
-                            >
-                              <span className="text-white text-xs">✓</span>
-                            </motion.div>
-                          </div>
-
-                          {/* Document Type Badge */}
-                          <div className="inline-flex items-center px-2 py-1 rounded text-xs font-medium mb-2 bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-200">
-                            {document.type}
-                          </div>
-
-                          {/* Document Info */}
-                          <h4 className="font-medium text-sm text-gray-900 dark:text-white mb-1 pr-8">
-                            {document.name}
-                          </h4>
-                          <p className="text-xs text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">
-                            {document.description}
-                          </p>
-
-                          {/* File Info */}
-                          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                            <span>{formatFileSize(document.size || 0)}</span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                window.open(document.url, '_blank')
-                              }}
-                              className="text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 hover:underline"
-                            >
-                              Preview
-                            </button>
-                          </div>
-                        </motion.div>
-                      )
-                    })}
-                  </AnimatePresence>
-                </div>
-
-                {/* No Results */}
-                {filteredDocuments.length === 0 && (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500 dark:text-gray-400">
-                      No documents found. Try adjusting your search or filter.
-                    </p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="ordering"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {/* Document Count */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="mb-8 p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-primary-200 dark:border-primary-800"
+            <div className="relative">
+              <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value as DocumentType | 'all')}
+                className="form-input pl-4 pr-10 min-w-48 bg-white dark:bg-gray-700"
               >
-                <p className="text-primary-700 dark:text-primary-300 font-medium text-center">
-                  {sortedDocuments.length} document{sortedDocuments.length !== 1 ? 's' : ''} selected for your packet
-                </p>
-              </motion.div>
+                <option value="all">All Types</option>
+                {documentTypes.map(type => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-              {/* Instructions */}
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 max-w-3xl mx-auto mb-8">
-                <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">How to reorder documents:</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-blue-800 dark:text-blue-200">
-                  <div className="flex items-center gap-2">
-                    <Bars3Icon className="w-4 h-4" />
-                    <span>Use the drag handle (⋮⋮⋮) to drag documents up or down</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <ChevronUpIcon className="w-4 h-4" />
-                    <ChevronDownIcon className="w-4 h-4" />
-                    <span>Click arrow buttons to move documents one position</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <EyeIcon className="w-4 h-4" />
-                    <span>Click the eye icon to preview documents in a new tab</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <TrashIcon className="w-4 h-4" />
-                    <span>Click the trash icon to remove a document</span>
-                  </div>
-                </div>
-                <p className="text-xs text-blue-700 dark:text-blue-300 mt-2 italic">
-                  Your cover page will always appear first, regardless of the order here.
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Document List (only show when not in selection mode) */}
-        {!showSelection && sortedDocuments.length > 0 ? (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={sortedDocuments.map(doc => doc.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-4 mb-8">
-                <AnimatePresence>
-                  {sortedDocuments.map((document, index) => (
-                    <SortableItem
-                      key={document.id}
-                      document={document}
-                      index={index}
-                      totalCount={sortedDocuments.length}
-                      onRemove={removeDocument}
-                      onMoveUp={moveDocumentUp}
-                      onMoveDown={moveDocumentDown}
-                      onPreview={previewDocument}
-                    />
-                  ))}
-                </AnimatePresence>
-              </div>
-            </SortableContext>
-          </DndContext>
-        ) : null}
-
-        {!showSelection && sortedDocuments.length === 0 && (
+          {/* Selected Count */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-12"
+            className="mb-6 p-4 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
           >
-            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {sortedDocuments.length} document{sortedDocuments.length !== 1 ? 's' : ''} selected
+              {sortedDocuments.length > 0 && (
+                <span className="ml-2 text-cyan-600 dark:text-cyan-400">
+                  ✓ Ready to arrange
+                </span>
+              )}
+            </p>
+          </motion.div>
+
+          {/* Documents Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+            <AnimatePresence>
+              {filteredDocuments.map((document, index) => {
+                const isSelected = isDocumentSelected(document.id)
+
+                return (
+                  <motion.div
+                    key={document.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ delay: index * 0.05 }}
+                    className={cn(
+                      'relative cursor-pointer transition-all duration-200',
+                      'border-2 rounded-lg p-4 bg-white dark:bg-gray-700',
+                      isSelected
+                        ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 shadow-md'
+                        : 'border-gray-200 dark:border-gray-600 hover:border-cyan-300 hover:shadow-sm'
+                    )}
+                    onClick={() => toggleDocument(document)}
+                  >
+                    {/* Selection Indicator */}
+                    <div className="absolute top-3 right-3">
+                      <motion.div
+                        initial={false}
+                        animate={{ scale: isSelected ? 1 : 0 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center"
+                      >
+                        <span className="text-white text-xs">✓</span>
+                      </motion.div>
+                    </div>
+
+                    {/* Document Type Badge */}
+                    <div className="inline-flex items-center px-2 py-1 rounded text-xs font-medium mb-2 bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-200">
+                      {document.type}
+                    </div>
+
+                    {/* Document Info */}
+                    <h4 className="font-medium text-sm text-gray-900 dark:text-white mb-1 pr-8">
+                      {document.name}
+                    </h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">
+                      {document.description}
+                    </p>
+
+                    {/* File Info */}
+                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                      <span>{formatFileSize(document.size || 0)}</span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          window.open(document.url, '_blank')
+                        }}
+                        className="text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 hover:underline"
+                      >
+                        Preview
+                      </button>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </AnimatePresence>
+          </div>
+
+          {/* No Results */}
+          {filteredDocuments.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-gray-500 dark:text-gray-400">
+                No documents found. Try adjusting your search or filter.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Document Ordering Section */}
+        {sortedDocuments.length > 0 && (
+          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Arrange Document Order
+            </h3>
+
+            {/* Instructions */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
+              <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 text-sm">How to reorder documents:</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-blue-800 dark:text-blue-200">
+                <div className="flex items-center gap-2">
+                  <Bars3Icon className="w-4 h-4" />
+                  <span>Drag handle (⋮⋮⋮) to reorder</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ChevronUpIcon className="w-3 h-3" />
+                  <ChevronDownIcon className="w-3 h-3" />
+                  <span>Arrow buttons to move one position</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <EyeIcon className="w-4 h-4" />
+                  <span>Eye icon to preview</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <TrashIcon className="w-4 h-4" />
+                  <span>Trash icon to remove</span>
+                </div>
+              </div>
+              <p className="text-xs text-blue-700 dark:text-blue-300 mt-2 italic">
+                Your cover page will always appear first.
+              </p>
+            </div>
+
+            {/* Document List */}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={sortedDocuments.map(doc => doc.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-4">
+                  <AnimatePresence>
+                    {sortedDocuments.map((document, index) => (
+                      <SortableItem
+                        key={document.id}
+                        document={document}
+                        index={index}
+                        totalCount={sortedDocuments.length}
+                        onRemove={removeDocument}
+                        onMoveUp={moveDocumentUp}
+                        onMoveDown={moveDocumentDown}
+                        onPreview={previewDocument}
+                      />
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </SortableContext>
+            </DndContext>
+          </div>
+        )}
+
+        {sortedDocuments.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+          >
+            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
               <DocumentCheckIcon className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               No documents selected
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">
-              Click the "Select Documents" button above to choose documents for your packet.
+            <p className="text-gray-500 dark:text-gray-400">
+              Select at least one document from the list above to continue.
             </p>
-            <button
-              onClick={() => setShowSelection(true)}
-              className="btn btn-primary bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
-            >
-              <DocumentCheckIcon className="w-4 h-4 mr-2" />
-              Select Documents
-            </button>
           </motion.div>
         )}
 
