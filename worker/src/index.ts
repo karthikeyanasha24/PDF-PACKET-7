@@ -70,13 +70,10 @@ export default {
         console.log(`Generating packet for: ${projectData.projectName}`)
         console.log(`Processing ${documents.length} documents`)
 
-        // Create new PDF document
-        const finalPdf = await PDFDocument.create()
+        // Load the template PDF and fill it
+        const finalPdf = await loadAndFillTemplate(projectData)
 
-        // Add cover page
-        await addCoverPage(finalPdf, projectData)
-
-        let currentPageNumber = 2 // Start after cover page
+        let currentPageNumber = finalPdf.getPageCount() + 1 // Start after template pages
 
         // Process each document
         for (const doc of documents) {
@@ -187,6 +184,152 @@ async function fetchPDF(url: string): Promise<ArrayBuffer | null> {
   } catch (error) {
     console.error(`Error fetching PDF from ${url}:`, error)
     return null
+  }
+}
+
+async function loadAndFillTemplate(projectData: ProjectData): Promise<PDFDocument> {
+  try {
+    // Fetch the template PDF from GitHub
+    const templateUrl = 'https://raw.githubusercontent.com/karthikeyanasha24/pdf-packet-4/main/PDF-TEMPLATE/Submittal%20Form_Floor%20Panels.pdf'
+    console.log('Fetching template PDF from:', templateUrl)
+
+    const response = await fetch(templateUrl, {
+      headers: {
+        'User-Agent': 'PDF-Packet-Generator/1.0',
+      }
+    })
+
+    if (!response.ok) {
+      console.error(`Failed to fetch template: ${response.status} ${response.statusText}`)
+      // Fallback to creating a custom cover page
+      const pdf = await PDFDocument.create()
+      await addCoverPage(pdf, projectData)
+      return pdf
+    }
+
+    const templateBytes = await response.arrayBuffer()
+    console.log(`Template fetched successfully: ${templateBytes.byteLength} bytes`)
+
+    // Load the template PDF
+    const pdfDoc = await PDFDocument.load(templateBytes)
+
+    // Get the form from the template
+    const form = pdfDoc.getForm()
+    const fields = form.getFields()
+
+    console.log(`Template has ${fields.length} form fields`)
+    fields.forEach(field => {
+      console.log(`Field: ${field.getName()} - Type: ${field.constructor.name}`)
+    })
+
+    // Fill in the form fields
+    try {
+      // Try to fill fields by their names (common field names in PDF forms)
+      const fieldMappings = [
+        { names: ['Submitted To', 'submittedTo', 'submitted_to'], value: projectData.submittedTo },
+        { names: ['Project Name', 'projectName', 'project_name'], value: projectData.projectName },
+        { names: ['Project Number', 'projectNumber', 'project_number'], value: projectData.projectNumber || '' },
+        { names: ['Prepared By', 'preparedBy', 'prepared_by'], value: projectData.preparedBy },
+        { names: ['Phone/Email', 'phoneEmail', 'phone_email', 'PhoneEmail'], value: `${projectData.phoneNumber} / ${projectData.emailAddress}` },
+        { names: ['Date', 'date'], value: projectData.date },
+      ]
+
+      fieldMappings.forEach(mapping => {
+        for (const fieldName of mapping.names) {
+          try {
+            const field = form.getTextField(fieldName)
+            if (field) {
+              field.setText(mapping.value)
+              console.log(`Set field ${fieldName} to: ${mapping.value}`)
+              break
+            }
+          } catch (e) {
+            // Field doesn't exist or isn't a text field, try next name
+          }
+        }
+      })
+
+      // Handle checkboxes for Status/Action
+      const statusCheckboxes = [
+        { names: ['For Review', 'forReview', 'for_review'], value: projectData.status.forReview },
+        { names: ['For Approval', 'forApproval', 'for_approval'], value: projectData.status.forApproval },
+        { names: ['For Record', 'forRecord', 'for_record'], value: projectData.status.forRecord },
+        { names: ['For Information Only', 'forInformationOnly', 'for_information_only'], value: projectData.status.forInformationOnly },
+      ]
+
+      statusCheckboxes.forEach(mapping => {
+        for (const fieldName of mapping.names) {
+          try {
+            const checkbox = form.getCheckBox(fieldName)
+            if (checkbox) {
+              if (mapping.value) {
+                checkbox.check()
+              } else {
+                checkbox.uncheck()
+              }
+              console.log(`Set checkbox ${fieldName} to: ${mapping.value}`)
+              break
+            }
+          } catch (e) {
+            // Field doesn't exist or isn't a checkbox, try next name
+          }
+        }
+      })
+
+      // Handle checkboxes for Submittal Type
+      const submittalCheckboxes = [
+        { names: ['TDS', 'tds'], value: projectData.submittalType.tds },
+        { names: ['3-Part Specs', '3PartSpecs', 'threePartSpecs'], value: projectData.submittalType.threePartSpecs },
+        { names: ['Test Report ICC-ESR 5194', 'testReportIccEsr5194'], value: projectData.submittalType.testReportIccEsr5194 },
+        { names: ['Test Report ICC-ESL 1645', 'testReportIccEsl1645'], value: projectData.submittalType.testReportIccEsl1645 },
+        { names: ['Fire Assembly', 'fireAssembly'], value: projectData.submittalType.fireAssembly },
+        { names: ['Fire Assembly 01', 'fireAssembly01'], value: projectData.submittalType.fireAssembly01 },
+        { names: ['Fire Assembly 02', 'fireAssembly02'], value: projectData.submittalType.fireAssembly02 },
+        { names: ['Fire Assembly 03', 'fireAssembly03'], value: projectData.submittalType.fireAssembly03 },
+        { names: ['MSDS', 'msds', 'Material Safety Data Sheet'], value: projectData.submittalType.msds },
+        { names: ['LEED Guide', 'leedGuide'], value: projectData.submittalType.leedGuide },
+        { names: ['Installation Guide', 'installationGuide'], value: projectData.submittalType.installationGuide },
+        { names: ['Warranty', 'warranty'], value: projectData.submittalType.warranty },
+        { names: ['Samples', 'samples'], value: projectData.submittalType.samples },
+        { names: ['Other', 'other'], value: projectData.submittalType.other },
+      ]
+
+      submittalCheckboxes.forEach(mapping => {
+        for (const fieldName of mapping.names) {
+          try {
+            const checkbox = form.getCheckBox(fieldName)
+            if (checkbox) {
+              if (mapping.value) {
+                checkbox.check()
+              } else {
+                checkbox.uncheck()
+              }
+              console.log(`Set checkbox ${fieldName} to: ${mapping.value}`)
+              break
+            }
+          } catch (e) {
+            // Field doesn't exist or isn't a checkbox, try next name
+          }
+        }
+      })
+
+      // Flatten the form to make it non-editable
+      form.flatten()
+
+    } catch (fillError) {
+      console.warn('Error filling form fields:', fillError)
+      console.log('Template will be used as-is without filling fields')
+    }
+
+    return pdfDoc
+
+  } catch (error) {
+    console.error('Error loading template PDF:', error)
+    // Fallback: create a custom cover page
+    console.log('Falling back to custom cover page')
+    const pdf = await PDFDocument.create()
+    await addCoverPage(pdf, projectData)
+    return pdf
   }
 }
 
